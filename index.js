@@ -67,6 +67,15 @@ function incrementItemPrice(item) {
   return item;
 }
 
+function decrementAllAuctionTimes() {
+  auctions.forEach(function(item) {
+    item.seconds_left--;
+    if (item.seconds_left < 1) {
+      item.seconds_left = 1;
+    }
+  });
+}
+
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -94,6 +103,7 @@ function randomBid() {
 }
 
 setTimeout(randomBid, MINIMUM_BID_DELAY);
+setInterval(decrementAllAuctionTimes, 1000);
 
 app.get('/auctions', function(req, res) {
   res.send(auctions);
