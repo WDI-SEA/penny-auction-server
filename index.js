@@ -1,4 +1,5 @@
-var RANDOM_BID_DELAY = 3000;
+var MINIMUM_BID_DELAY = 3000;
+var RANDOM_BID_DELAY = 5000;
 var BID_TIME_INCREMENT = 8;
 
 var auctions = require('./initial_auctions.json');
@@ -87,10 +88,10 @@ function randomBid() {
   item = bindAuctionItemWithUpdate(item);
   console.log("item now:", item);
   
-  setTimeout(randomBid, Math.random() * RANDOM_BID_DELAY);
+  setTimeout(randomBid, MININUM_BID_DELAY + Math.random() * RANDOM_BID_DELAY);
 }
 
-setTimeout(randomBid, Math.random() * RANDOM_BID_DELAY);
+setTimeout(randomBid, MININUM_BID_DELAY);
 
 app.get('/auctions', function(req, res) {
   res.send(auctions);
