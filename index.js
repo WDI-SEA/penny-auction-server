@@ -143,6 +143,10 @@ app.get('/start-random-betters', function(req, res) {
   res.send(true);
 });
 
+app.get('/users', function(req, res) {
+  res.send(betters);
+});
+
 app.get('/auctions', function(req, res) {
   res.send(auctions);
 });
