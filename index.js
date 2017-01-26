@@ -1,6 +1,7 @@
 var BID_DELAY_OFFSET = -3;
 var BID_TIME_INCREMENT = 10;
 var MAX_SECONDS_LEFT = 30;
+var RANDOM_BETTING_DISABLED = false;
 
 var auctions = require('./initial_auctions.json');
 var fake_data = require('./fake_data.json');
@@ -10,6 +11,8 @@ var app = express();
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+var betters = {};
 
 function initializeAuctions() {
   auctions.forEach(function(auction) {
@@ -26,6 +29,8 @@ function initializeAuctions() {
     
     bindAuctionItemWithUpdate(auction);
   });
+
+  betters = {};
 }
 initializeAuctions();
 
@@ -101,6 +106,9 @@ app.use(allowCrossDomain);
 app.use(express.static(__dirname + '/static'));
 
 function randomBid(item) {
+  if (RANDOM_BETTING_DISABLED) {
+    return;
+  }
   if (item.closed) {
     console.log("no bid accepted. item closed.");
     return;
@@ -123,7 +131,17 @@ auctions.forEach(function(item) {
   }, Math.random() * 1000 * item.seconds_left);
 });
 
-setInterval(decrementAllAuctionTimes, 1000);
+var bettingInterval = setInterval(decrementAllAuctionTimes, 1000);
+
+app.get('/stop-random-betters', function(req, res) {
+  RANDOM_BETTING_DISABLED = true;
+  res.send(true);
+});
+
+app.get('/start-random-betters', function(req, res) {
+  RANDOM_BETTING_DISABLED = false;
+  res.send(true);
+});
 
 app.get('/auctions', function(req, res) {
   res.send(auctions);
@@ -172,11 +190,27 @@ function userBet(req, res, id, username) {
     return;
   }
 
+  if (betters[username] === undefined) {
+    betters[username] = 20;
+  }
+
+  if (betters[username] < 0) {
+    res.send({error: "No pennies left for user " + username});
+  }
+
+  betters[username]--;
+
   var saveTime = item.seconds_left;
   item = bindAuctionItemWithUpdate(item);
   item.username = username;
   item.seconds_left = saveTime + 10;
-  res.send(item);
+  res.send({
+    item: item,
+    user: {
+      username: username,
+      pennies: betters[username]
+    }
+  });
 };
 
 app.get('/reset', function(req, res) {
