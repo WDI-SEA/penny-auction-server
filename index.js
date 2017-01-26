@@ -1,3 +1,6 @@
+var RANDOM_BID_DELAY = 3000;
+var BID_TIME_INCREMENT = 8;
+
 var auctions = require('./initial_auctions.json');
 var fake_data = require('./fake_data.json');
 var express = require('express');
@@ -17,12 +20,13 @@ auctions.forEach(function(auction) {
   bindAuctionItemWithUpdate(auction);
 });
 
-function bindAuctionItemWithUpdate(auction_item) {
+function bindAuctionItemWithUpdate(item) {
+  var saveSeconds = item.seconds_left;
   var update = getRandomUpdate();
-  auction_item.username = update.username;
-  auction_item.seconds_left = update.seconds_left;
-  incrementItemPrice(auction_item);
-  return auction_item;
+  item.username = update.username;
+  item.seconds_left = saveSeconds + 10;
+  incrementItemPrice(item);
+  return item;
 }
 
 function getRandomItem() {
@@ -83,10 +87,10 @@ function randomBid() {
   item = bindAuctionItemWithUpdate(item);
   console.log("item now:", item);
   
-  setTimeout(randomBid, Math.random() * 2000);
+  setTimeout(randomBid, Math.random() * RANDOM_BID_DELAY);
 }
 
-setTimeout(randomBid, Math.random() * 2000);
+setTimeout(randomBid, Math.random() * RANDOM_BID_DELAY);
 
 app.get('/auctions', function(req, res) {
   res.send(auctions);
