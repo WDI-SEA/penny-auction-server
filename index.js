@@ -11,15 +11,18 @@ var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-auctions.forEach(function(auction) {
-  var update = getRandomUpdate();
-  auction.username = update.username;
-  auction.price = update.price;
-  auction.seconds_left = update.seconds_left;
-  auction.img = "http://pennyauctionserver.herokuapp.com/img/" + auction.img;
-  
-  bindAuctionItemWithUpdate(auction);
-});
+function initializeAuctions() {
+  auctions.forEach(function(auction) {
+    var update = getRandomUpdate();
+    auction.username = update.username;
+    auction.price = update.price;
+    auction.seconds_left = update.seconds_left;
+    auction.img = "http://pennyauctionserver.herokuapp.com/img/" + auction.img;
+    
+    bindAuctionItemWithUpdate(auction);
+  });
+}
+initializeAuctions();
 
 function bindAuctionItemWithUpdate(item) {
   var saveSeconds = item.seconds_left;
@@ -164,6 +167,11 @@ app.put('/auctions/:id', function(req, res) {
   item.username = username;
   item.seconds_left = saveTime + 10;
   res.send(item);
+});
+
+app.get('/reset', function(req, res) {
+  initializeAuctions()
+  res.send(auctions);
 });
 
 app.get('/*', function(req, res) {
