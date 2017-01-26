@@ -200,6 +200,7 @@ function userBet(req, res, id, username) {
 
   if (betters[username] < 0) {
     res.send({error: "No pennies left for user " + username});
+    return
   }
 
   betters[username]--;
