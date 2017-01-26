@@ -23,6 +23,12 @@ function bindAuctionItemWithUpdate(auction_item) {
   return auction_item;
 }
 
+function getRandomItem() {
+  var index = Math.floor(Math.random() * auctions.length);
+  var item = auctions[index];
+  return item;
+}
+
 function getRandomUpdate() {
   var index = Math.floor(Math.random() * fake_data.length);
   var choice = fake_data[index];
@@ -68,6 +74,17 @@ var allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 
+function randomBid() {
+  var item = getRandomItem();
+  console.log("item was:", item);
+  item = bindAuctionItemWithUpdate(item);
+  console.log("item now:", item);
+  
+  setTimeout(randomBid, Math.random() * 2000);
+}
+
+setTimeout(randomBid, Math.random() * 2000);
+
 app.get('/auctions', function(req, res) {
   res.send(auctions);
 });
@@ -80,7 +97,6 @@ app.get('/auctions/:id', function(req, res) {
   }
   
   var item = auctions[id];
-  item = bindAuctionItemWithUpdate(item);
   res.send(item);
 });
 
