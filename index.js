@@ -1,6 +1,7 @@
 var MINIMUM_BID_DELAY = 3000;
 var RANDOM_BID_DELAY = 5000;
 var BID_TIME_INCREMENT = 8;
+var MAX_SECONDS_LEFT = 30;
 
 var auctions = require('./initial_auctions.json');
 var fake_data = require('./fake_data.json');
@@ -26,6 +27,7 @@ function bindAuctionItemWithUpdate(item) {
   var update = getRandomUpdate();
   item.username = update.username;
   item.seconds_left = saveSeconds + 10;
+  item.seconds_left = Math.min(item.seconds_left, MAX_SECONDS_LEFT);
   incrementItemPrice(item);
   return item;
 }
@@ -88,10 +90,10 @@ function randomBid() {
   item = bindAuctionItemWithUpdate(item);
   console.log("item now:", item);
   
-  setTimeout(randomBid, MININUM_BID_DELAY + Math.random() * RANDOM_BID_DELAY);
+  setTimeout(randomBid, MINIMUM_BID_DELAY + Math.random() * RANDOM_BID_DELAY);
 }
 
-setTimeout(randomBid, MININUM_BID_DELAY);
+setTimeout(randomBid, MINIMUM_BID_DELAY);
 
 app.get('/auctions', function(req, res) {
   res.send(auctions);
