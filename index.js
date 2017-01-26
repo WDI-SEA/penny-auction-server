@@ -17,6 +17,7 @@ function initializeAuctions() {
     auction.username = update.username;
     auction.price = update.price;
     auction.seconds_left = update.seconds_left;
+    auction.closed = false;
     // only add the penny auction server prefix the first time
     // the site loads.
     if (auction.img.indexOf("pennyauctionserver") < 0) {
