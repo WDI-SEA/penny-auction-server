@@ -1,27 +1,56 @@
+var auctions = require('./initial_auctions.json');
 var fake_data = require('./fake_data.json');
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
-//
-// var BASE_AUCTIONS = {
-//   [
-//     {
-//       title:
-//       img:
-//     }
-//   ]
-// }
-//
-// var AUCTIONS = {
-//   [
-//     {
-//       title:'',
-//       img:','
-//       time_left:
-//       price:
-//       last_bidder:
-//     }
-//   ]
-// }
+
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+auctions.forEach(function(auction) {
+  var update = getRandomUpdate();
+  auction.username = update.username;
+  auction.price = update.price;
+  auction.seconds_left = update.seconds_left;
+  bindAuctionItemWithUpdate(auction);
+});
+
+function bindAuctionItemWithUpdate(auction_item) {
+  var update = getRandomUpdate();
+  auction_item.username = update.username;
+  auction_item.seconds_left = update.seconds_left;
+  incrementItemPrice(auction_item);
+  return auction_item;
+}
+
+function getRandomUpdate() {
+  var index = Math.floor(Math.random() * fake_data.length);
+  var choice = fake_data[index];
+  return choice;
+}
+
+function incrementItemPrice(item) {
+  var values = item.price.substr(1).split(".");
+  var dollars = values[0];
+  var cents = values[1];
+  
+  dollars = parseInt(dollars, 10);
+  cents = parseInt(cents, 10);
+  
+  cents++;
+  
+  if (cents === 100) {
+    cents = 0;
+    dollars++;
+  }
+  
+  if (cents < 10) {
+    item.price = "$" + dollars + ".0" + cents;
+  } else {
+    item.price = "$" + dollars + "." + cents;
+  }
+  return item;
+}
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -39,11 +68,40 @@ var allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 
-app.get('/poll_item/:id', function(req, res) {
-  // haha, ignore the id and just return whatever.
-  var index = Math.floor(Math.random() * fake_data.length);
-  var choice = fake_data[index];
-  res.send(choice);
+app.get('/auctions', function(req, res) {
+  res.send(auctions);
+});
+
+app.get('/auctions/:id', function(req, res) {
+  var id = parseInt(req.params.id, 10);
+  
+  if (auctions[id] === undefined) {
+    res.send({error: "Unknown auction id: " + id});
+  }
+  
+  var item = auctions[id];
+  item = bindAuctionItemWithUpdate(item);
+  res.send(item);
+});
+
+app.put('/auctions/:id', function(req, res) {
+  var username = "GHOST BIDDER";
+  if (req.body && req.body.username) {
+    username = req.body.username;
+  }
+  
+  var id = parseInt(req.params.id, 10);
+  
+  if (auctions[id] === undefined) {
+    res.send({error: "Unknown auction id: " + id});
+  }
+  
+  var item = auctions[id];
+  var saveTime = item.seconds_left;
+  item = bindAuctionItemWithUpdate(item);
+  item.username = username;
+  item.seconds_left = saveTime + 10;
+  res.send(item);
 });
 
 app.get('/*', function(req, res) {
