@@ -1,6 +1,4 @@
-var MINIMUM_BID_DELAY = 3000;
-var RANDOM_BID_DELAY = 5000;
-var BID_TIME_INCREMENT = 8;
+var BID_TIME_INCREMENT = 10;
 var MAX_SECONDS_LEFT = 30;
 
 var auctions = require('./initial_auctions.json');
@@ -26,7 +24,7 @@ function bindAuctionItemWithUpdate(item) {
   var saveSeconds = item.seconds_left;
   var update = getRandomUpdate();
   item.username = update.username;
-  item.seconds_left = saveSeconds + 10;
+  item.seconds_left = saveSeconds + BID_TIME_INCREMENT;
   item.seconds_left = Math.min(item.seconds_left, MAX_SECONDS_LEFT);
   incrementItemPrice(item);
   return item;
@@ -93,16 +91,22 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 app.use(express.static(__dirname + '/static'));
 
-function randomBid() {
-  var item = getRandomItem();
+function randomBid(item) {
   console.log("item was:", item);
   item = bindAuctionItemWithUpdate(item);
   console.log("item now:", item);
   
-  setTimeout(randomBid, MINIMUM_BID_DELAY + Math.random() * RANDOM_BID_DELAY);
+  setTimeout(function() {
+    randomBid(item);
+  }, Math.random() * 1000 * item.seconds_left);
 }
 
-setTimeout(randomBid, MINIMUM_BID_DELAY);
+auctions.forEach(function(item) {
+  setTimeout(function() {
+    randomBid(item);
+  }, Math.random() * 1000 * item.seconds_left);
+});
+
 setInterval(decrementAllAuctionTimes, 1000);
 
 app.get('/auctions', function(req, res) {
