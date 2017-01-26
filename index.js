@@ -73,6 +73,7 @@ var allowCrossDomain = function(req, res, next) {
 };
 
 app.use(allowCrossDomain);
+app.use(express.static(__dirname + '/static'));
 
 function randomBid() {
   var item = getRandomItem();
