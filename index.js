@@ -1,3 +1,4 @@
+var STARTING_PENNIES = 10;
 var BID_DELAY_OFFSET = -3;
 var BID_TIME_INCREMENT = 10;
 var MAX_SECONDS_LEFT = 30;
@@ -195,7 +196,7 @@ function userBet(req, res, id, username) {
   }
 
   if (betters[username] === undefined) {
-    betters[username] = 20;
+    betters[username] = STARTING_PENNIES;
   }
 
   if (betters[username] < 0) {
@@ -209,7 +210,7 @@ function userBet(req, res, id, username) {
   item = bindAuctionItemWithUpdate(item);
   item.username = username;
   item.seconds_left = saveTime + 10;
-  item.seconds_left = Math.max(item.seconds_left, MAX_SECONDS_LEFT);
+  item.seconds_left = Math.min(item.seconds_left, MAX_SECONDS_LEFT);
   res.send({
     item: item,
     user: {
