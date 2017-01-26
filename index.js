@@ -12,6 +12,8 @@ auctions.forEach(function(auction) {
   auction.username = update.username;
   auction.price = update.price;
   auction.seconds_left = update.seconds_left;
+  auction.img = "http://pennyauctionserver.herokuapp.com/img/" + auction.img;
+  
   bindAuctionItemWithUpdate(auction);
 });
 
