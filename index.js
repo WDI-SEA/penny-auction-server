@@ -204,6 +204,7 @@ function userBet(req, res, id, username) {
   item = bindAuctionItemWithUpdate(item);
   item.username = username;
   item.seconds_left = saveTime + 10;
+  item.seconds_left = Math.max(item.seconds_left, MAX_SECONDS_LEFT);
   res.send({
     item: item,
     user: {
