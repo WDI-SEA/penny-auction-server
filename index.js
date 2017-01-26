@@ -68,8 +68,10 @@ function incrementItemPrice(item) {
 function decrementAllAuctionTimes() {
   auctions.forEach(function(item) {
     item.seconds_left--;
-    if (item.seconds_left < 1) {
-      item.seconds_left = 1;
+    if (item.seconds_left <= 0) {
+      console.log("item closed", item);
+      item.closed = true;
+      item.seconds_left = 0;
     }
   });
 }
@@ -92,13 +94,22 @@ app.use(allowCrossDomain);
 app.use(express.static(__dirname + '/static'));
 
 function randomBid(item) {
+  if (item.closed) {
+    console.log("no bid accepted. item closed.");
+    return;
+  }
+
   console.log("item was:", item);
   item = bindAuctionItemWithUpdate(item);
   console.log("item now:", item);
   
+  // bid again somewhere in the range of the time left for the item.
+  // Add one second to the time left to give a small chance that the
+  // bid will end.
+  var delay = Math.random() * 1000 * item.seconds_left + 1;
   setTimeout(function() {
     randomBid(item);
-  }, Math.random() * 1000 * item.seconds_left);
+  }, delay);
 }
 
 auctions.forEach(function(item) {
@@ -137,6 +148,16 @@ app.put('/auctions/:id', function(req, res) {
   }
   
   var item = auctions[id];
+
+  if (item.closed) {
+    console.log("user tried to bid on closed auction:", username, item);
+    res.send({
+      error: "Bid not accepted. Auction closed for item",
+      item: item
+    });
+    return;
+  }
+
   var saveTime = item.seconds_left;
   item = bindAuctionItemWithUpdate(item);
   item.username = username;
