@@ -91,8 +91,7 @@ var allowCrossDomain = function(req, res, next) {
     // intercept OPTIONS method
     if ('OPTIONS' == req.method) {
       res.send(200);
-    }
-    else {
+    } else {
       next();
     }
 };
@@ -140,17 +139,27 @@ app.get('/auctions/:id', function(req, res) {
   res.send(item);
 });
 
+app.get('/auctions/:id/:username', function(req, res) {
+  var username = req.params.username;
+  userBet(req, res, req.params.id, username);
+});
+
 app.put('/auctions/:id', function(req, res) {
   var username = "GHOST BIDDER";
   if (req.body && req.body.username) {
     username = req.body.username;
   }
   
+  userBet(req, res, req.params.id, username);
+});
+  
+function userBet(req, res, id, username) {
   var id = parseInt(req.params.id, 10);
+
   if (auctions[id] === undefined) {
     res.send({error: "Unknown auction id: " + id});
   }
-  
+
   var item = auctions[id];
 
   if (item.closed) {
@@ -167,7 +176,7 @@ app.put('/auctions/:id', function(req, res) {
   item.username = username;
   item.seconds_left = saveTime + 10;
   res.send(item);
-});
+};
 
 app.get('/reset', function(req, res) {
   initializeAuctions()
