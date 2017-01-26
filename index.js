@@ -1,3 +1,4 @@
+var BID_DELAY_OFFSET = -3;
 var BID_TIME_INCREMENT = 10;
 var MAX_SECONDS_LEFT = 30;
 
@@ -106,7 +107,7 @@ function randomBid(item) {
   // bid again somewhere in the range of the time left for the item.
   // Add one second to the time left to give a small chance that the
   // bid will end.
-  var delay = Math.random() * 1000 * item.seconds_left + 1;
+  var delay = Math.random() * 1000 * item.seconds_left + BID_DELAY_OFFSET;
   setTimeout(function() {
     randomBid(item);
   }, delay);
