@@ -73,7 +73,6 @@ function decrementAllAuctionTimes() {
   auctions.forEach(function(item) {
     item.seconds_left--;
     if (item.seconds_left <= 0) {
-      console.log("item closed", item);
       item.closed = true;
       item.seconds_left = 0;
     }
@@ -103,9 +102,7 @@ function randomBid(item) {
     return;
   }
 
-  console.log("item was:", item);
   item = bindAuctionItemWithUpdate(item);
-  console.log("item now:", item);
   
   // bid again somewhere in the range of the time left for the item.
   // Add one second to the time left to give a small chance that the
@@ -146,7 +143,6 @@ app.put('/auctions/:id', function(req, res) {
   }
   
   var id = parseInt(req.params.id, 10);
-  
   if (auctions[id] === undefined) {
     res.send({error: "Unknown auction id: " + id});
   }
