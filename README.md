@@ -15,16 +15,38 @@ Enjoy!
 
 # API
 ### Auction Information
-* GET <pennyauctionserver.herokuapp.com/users>
-* GET <pennyauctionserver.herokuapp.com/auctions>
-* GET <pennyauctionserver.herokuapp.com/auctions/0>
-* PUT <pennyauctionserver.herokuapp.com/auctions/0>
+* GET <http://pennyauctionserver.herokuapp.com/users>
+* GET <http://pennyauctionserver.herokuapp.com/auctions>
+* GET <http://pennyauctionserver.herokuapp.com/auctions/0>
+* PUT <http://pennyauctionserver.herokuapp.com/auctions/0>
   * body: ```{username: "some username"}```
 
+Here's how you can use `fetch()` to initiate a PUT request to the server:
+
+```js
+var json = JSON.stringify({username: 'penguincool42'});
+fetch(`http://pennyauctionserver.herokuapp.com/auctions/${this.props.item.id}`,
+  {
+    method: 'PUT',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: json
+})
+.then((response) => {
+  return response.json();
+}).then((response) => {
+  console.log("put response", response);
+}).catch((response) => {
+  console.log('Error!', response);
+});
+```
+
 ### Auction Remote Controls
-* GET <pennyauctionserver.herokuapp.com/reset>
-* GET <pennyauctionserver.herokuapp.com/stop-random-betters>
-* GET <pennyauctionserver.herokuapp.com/start-random-betters>
+* GET <http://pennyauctionserver.herokuapp.com/reset>
+* GET <http://pennyauctionserver.herokuapp.com/stop-random-betters>
+* GET <http://pennyauctionserver.herokuapp.com/start-random-betters>
 
 # Random Betters
 The server includes a mechanism to simulate activity on all of the auctions.
