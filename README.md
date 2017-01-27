@@ -9,6 +9,7 @@ stabilizes to SOLD) and the random betters functionality can be enabled and
 disabled gracefully.
 
 The penny-auction-server repo has a sister repo for the penny auction client:
+
 <https://github.com/WDI-SEA/penny-auction-client-solution>
 
 Enjoy!
