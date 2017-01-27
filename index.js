@@ -4,6 +4,10 @@ var BID_TIME_INCREMENT = 10;
 var MAX_SECONDS_LEFT = 30;
 var RANDOM_BETTING_DISABLED = false;
 
+// just a collection of the most recent bid events to be
+// able to inspect what's going on.
+var LAST_BIDS = [];
+
 var auctions = require('./initial_auctions.json');
 var fake_data = require('./fake_data.json');
 var express = require('express');
@@ -116,6 +120,16 @@ function randomBid(item) {
   }
 
   item = bindAuctionItemWithUpdate(item);
+
+	var bidEvent = {
+    item: item,
+    timestamp: new Date()
+	};
+
+	LAST_BIDS.push(bidEvent);
+	if(LAST_BIDS.length > 5) {
+	  LAST_BIDS.shift();
+	}
   
   // bid again somewhere in the range of the time left for the item.
   // Add one second to the time left to give a small chance that the
@@ -223,6 +237,13 @@ function userBet(req, res, id, username) {
 app.get('/reset', function(req, res) {
   initializeAuctions()
   res.send(auctions);
+});
+
+app.get('/info', function(req, res) {
+  res.send({
+    RANDOM_BETTING_DISABLED: RANDOM_BETTING_DISABLED,
+		LAST_BIDS: LAST_BIDS
+  });
 });
 
 app.get('/*', function(req, res) {
